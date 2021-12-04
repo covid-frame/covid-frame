@@ -20,14 +20,16 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License ",
         "Operating System :: POSIX :: Linux ",
     ],
-    packages=["scrapersave"],
+    packages=["covidframe"],
     python_requires=">=3.6",
     install_requires=[
-        'requests',
-        'lxml',
         'colorlog',
-        'google_api_python_client',
-        'python-dotenv'
+        'python-dotenv',
+        'numpy',
+        'keras',
+        'opencv_contrib_python',
+        'pandas',
+        'Wand'
     ],
     entry_points={
         'console_scripts': [
