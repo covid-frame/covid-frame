@@ -40,6 +40,7 @@ def load_files_list(database_info, base_path=None):
         files = files[np.isin(filenames, list(filenames_df))]
 
     n_df = generate_metadata(database_info, files, df)
+    print(len(n_df))
     return {
         "original": df,
         "info": n_df
@@ -114,11 +115,31 @@ def generate_metadata(database_info, files, original_metadata=None):
         column_category = database_info["type_own"]["column_category"]
         column_id = database_info["type_own"]["column_id"]
 
-        n_df = df.join(original_metadata
-                       .set_index(column_file_names)[[column_category,
-                                                      column_id]],
-                       on="image_name", how="left")
+        if column_file_names == column_id:
+            original_metadata["file_names"] = original_metadata[column_id]
+            column_file_names = "file_names"
 
+        include_suffix = True
+        if "include_suffix" in database_info["type_own"]:
+            include_suffix = database_info["type_own"]["include_suffix"]
+
+        if include_suffix:
+            n_df = df.join(original_metadata
+                           .set_index(column_file_names)[[column_category,
+                                                          column_id]],
+                           on="image_name", how="left")
+
+        else:
+            file_names_no_suffix = [f.stem for f in files]
+            df["image_name_no_suffix"] = file_names_no_suffix
+
+            n_df = df.join(original_metadata
+                           .set_index(column_file_names)[[column_category,
+                                                          column_id]],
+                           on="image_name_no_suffix", how="left")
+            n_df.drop(columns=["image_name_no_suffix"], inplace=True)
+
+        # print(n_df[column_category])
         mappings = database_info["type_own"]["mappings"]
         n_df["category"] = n_df[column_category].map(mappings)
         n_df.rename(columns={column_id: "id", column_category:
@@ -142,7 +163,7 @@ def generate_metadata(database_info, files, original_metadata=None):
 
 if __name__ == "__main__":
 
-    metadata_db = config.databases[4]
+    metadata_db = config.databases[2]
 
     base_path = "/mnt/Archivos/dataset-xray"
     info = load_files_list(metadata_db, base_path)

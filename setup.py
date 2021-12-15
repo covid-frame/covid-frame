@@ -20,7 +20,11 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License ",
         "Operating System :: POSIX :: Linux ",
     ],
-    packages=["covidframe"],
+    packages=setuptools.find_packages(
+        include=['covidframe',
+                 'covidframe.*']
+    ),
+    include_package_data=True,
     python_requires=">=3.6",
     install_requires=[
         'colorlog',

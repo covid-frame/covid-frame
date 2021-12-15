@@ -138,3 +138,14 @@ database_types = [
 image_extensions = [
     ".png", ".jpg", ".jpeg", ".tiff", ".bmp", '.PNG', '.JPG', '.JPEG'
 ]
+
+cnn = [
+    {
+        "name": "COVID-Net",
+        "mappings": {
+                "covid-19": "COVID-19",
+                "normal": "normal",
+                "pneumonia": "pneumonia",
+        },
+    }
+]

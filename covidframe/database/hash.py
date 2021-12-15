@@ -1,7 +1,17 @@
 from covidframe.tools.hash import dhash, imhash
 
+from joblib import Parallel, delayed
+from covidframe.multi.callback import BatchCompletionCallBack
 
-def add_hash_to_df(df, column_image_path="image_path"):
+import joblib.parallel
+joblib.parallel.BatchCompletionCallBack = BatchCompletionCallBack
+
+
+def add_hash_to_df(
+        df,
+        column_image_path="image_path",
+        parallel=False,
+        n_jobs=-1):
 
     # df["cv_hash"] = df.apply(lambda
     #                         row: dhash(str(row[column_image_path])),
@@ -12,15 +22,24 @@ def add_hash_to_df(df, column_image_path="image_path"):
     file_paths = df[column_image_path]
 
     cv_hashes = []
-    img_hashes = []
-    for idx, file_path in enumerate(file_paths):
-        print(f"Generating hash {idx+1}/{len(file_paths)}")
-        file_path = str(file_path)
-        cv_hashes.append(dhash(file_path))
-        img_hashes.append(imhash(file_path))
+    im_hashes = []
+
+    if parallel:
+        cv_hashes = Parallel(n_jobs=n_jobs)(
+            delayed(dhash)(str(file_path)) for file_path in
+            file_paths)
+        im_hashes = Parallel(n_jobs=n_jobs)(
+            delayed(imhash)(str(file_path)) for file_path in
+            file_paths)
+    else:
+        for idx, file_path in enumerate(file_paths):
+            print(f"Generating hash {idx+1}/{len(file_paths)}")
+            file_path = str(file_path)
+            cv_hashes.append(dhash(file_path))
+            im_hashes.append(imhash(file_path))
 
     df["cv_hash"] = cv_hashes
-    df["im_hash"] = img_hashes
+    df["im_hash"] = im_hashes
     return df
 
 
