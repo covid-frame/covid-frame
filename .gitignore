@@ -1,5 +1,7 @@
 # Custom dirs
 notebooks/my_model/*
+notebooks/my_model_eq_clahe/*
+notebooks/my_model_eq_simple/*
 output/
 key.json
 *.old
